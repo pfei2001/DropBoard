@@ -1,0 +1,10 @@
+# 运行时生成的本地配置（含本机绝对路径，不适合公开）
+DropBoard.json
+
+# 本地工具记忆目录
+.workbuddy/
+
+# 临时文件
+*.tmp
+*.log
+_thumbs.db
