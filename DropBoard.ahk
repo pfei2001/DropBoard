@@ -63,6 +63,7 @@ class DropBoard {
         this.hwnd := g.Hwnd
         this.pw := w
         this.ph := h
+        this.SetIcon()
 
         try DllCall("dwmapi\DwmSetWindowAttribute", "ptr", this.hwnd, "int", 33, "int*", 2, "int", 4)
 
@@ -97,6 +98,25 @@ class DropBoard {
     }
 
     P(v) => Round(v * this.s)
+
+    ; ---- 图标：托盘 + 窗口（任务栏 / Alt+Tab）----
+    ; 只依赖同目录 DropBoard.ico，缺失时静默跳过，不影响主流程
+    SetIcon() {
+        ico := A_ScriptDir "\DropBoard.ico"
+        if !FileExist(ico)
+            return
+        try TraySetIcon(ico)
+        A_IconTip := "拖放收纳板"
+        ; ICON_SMALL(0) 用 16px，ICON_BIG(1) 用 48px 应对 200% 缩放
+        for id in [0, 1] {
+            h := DllCall("user32\LoadImage", "ptr", 0, "str", ico, "uint", 1
+                , "int", (id ? 48 : 16), "int", (id ? 48 : 16)
+                , "uint", 0x8010, "ptr")            ; LR_LOADFROMFILE | LR_SHARED
+            if h
+                DllCall("user32\SendMessage", "ptr", this.hwnd, "uint", 0x0080
+                    , "ptr", id, "ptr", h)          ; WM_SETICON
+        }
+    }
 
     ; ---- 收起 / 展开 ----
     ToggleCollapse() {

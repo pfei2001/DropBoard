@@ -1,5 +1,7 @@
 # DropBoard · 拖放收纳板
 
+<img src="icons/DropBoard.png" width="92" align="right" alt="DropBoard 图标">
+
 > 一个常驻桌面小窗，把常用的**文件夹、文件、网址**收成卡片，之后一点就能打开。文件夹和文件直接拖进来，网址复制链接后一键粘贴。
 
 AutoHotkey v2.0+ · Windows 10 / 11 · 单文件 · 零依赖 · 暗色自绘 UI
@@ -44,10 +46,18 @@ AutoHotkey v2.0+ · Windows 10 / 11 · 单文件 · 零依赖 · 暗色自绘 UI
 
 ![收起状态](docs/screenshot-collapsed.png)
 
+## 图标
+
+三条横杠对应三个标签页，颜色与界面同源：靛蓝 `#5B6CF0`、青绿 `#19B39E`、橙 `#E0713F`。深底 `#15171C`，四角透明。
+
+`DropBoard.ico` 内含 16 / 32 / 48 / 64 / 128 / 256 六个尺寸，Windows 会按场景自己挑（任务栏用大图、托盘用 16px）。程序启动时读它设置托盘图标和窗口图标；文件缺失时静默跳过，不影响使用。
+
+想改配色或比例，改 `icons/make_icons.py` 顶部的常量后重跑即可（需要 Pillow，生成时用 `py -3`）。
+
 ## 快速开始
 
 1. 安装 [AutoHotkey v2](https://www.autohotkey.com/)（v2.0 或更高）。
-2. 下载 `DropBoard.ahk`，双击运行。
+2. 下载 `DropBoard.ahk` 和 `DropBoard.ico`，放同一个目录，双击 `DropBoard.ahk` 运行。
 3. 把几个常用目录拖进窗口；网址就复制链接后点「+ 粘贴网址」。完事。
 
 想把脚本转成独立 exe，用 AutoHotkey 自带的 Ahk2Exe 编译 `DropBoard.ahk` 即可，无需额外文件。
@@ -145,6 +155,8 @@ AutoHotkey v2.0+ · Windows 10 / 11 · 单文件 · 零依赖 · 暗色自绘 UI
 
 **JSON。** 没引第三方库，文件尾部自带一个最小解析器（对象 / 数组 / 字符串转义 / 数字 / 字面量），写盘时手工拼接以保持键顺序和缩进可读。
 
+**图标。** 托盘图标用 `TraySetIcon`，窗口图标走 `WM_SETICON` 发两个消息（`ICON_SMALL` 16px、`ICON_BIG` 48px，后者供任务栏和 Alt+Tab）。`LoadImage` 带 `LR_LOADFROMFILE | LR_SHARED`，句柄由系统托管，不需要自己 `DestroyIcon`——否则窗口销毁时容易漏释放。
+
 **打开与激活。**
 
 - 文件夹：通过 Shell COM（`Shell.Application` 的 `Windows` 集合）枚举已打开的资源管理器窗口，用 `Document.Folder.Self.Path` 拿到真实路径做比较。这是唯一可靠的办法——窗口标题会随视图变化，不可靠。
@@ -165,10 +177,12 @@ AutoHotkey v2.0+ · Windows 10 / 11 · 单文件 · 零依赖 · 暗色自绘 UI
 
 ```
 DropBoard.ahk    # 全部代码，单文件
+DropBoard.ico    # 应用图标，16–256 六个尺寸
 DropBoard.json   # 首次运行自动生成，本地配置（已 gitignore）
 README.md
 LICENSE
 docs/            # README 用截图
+icons/           # 图标源代码与生成脚本
 ```
 
 ## 许可
